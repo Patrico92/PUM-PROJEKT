@@ -16,6 +16,8 @@ public class MainMenu extends Activity implements View.OnClickListener {
     String TAG = "tag"; //to jest pomocnicze, służy do wyświetlania logów w konsoli
     Button buttonCreate;
     Button buttonBase;
+    Recipe recipe;
+    MyDBHandler myDBHandler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
