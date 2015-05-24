@@ -39,33 +39,17 @@ public class MainMenu extends Activity implements View.OnClickListener {
 
         buttonCreate = (Button) findViewById(R.id.buttonCreate);
         buttonCreate.setOnClickListener(this);
-        try
-        {
-            myDBHandler = new MyDBHandler(this,null,null,0);
-        }
-        catch (IOException e)
-        {
-            e.printStackTrace();
-        }
 
-        Recipe recipe = new Recipe("Gotowany ryż", "Ugotuj ryż w wodzie przez 10 min", new String[]{"ryż", "woda"},new String[]{"paczka","litr"});
+        myDBHandler = new MyDBHandler(this,null,null,0); //tworzymy handlera do obsługi bazy
 
+        Recipe recipe = new Recipe("Gotowany ryż", "Ugotuj ryż w wodzie przez 10 min", new String[]{"ryż", "woda"},new String[]{"paczka","litr"},null,null);
+        myDBHandler.addRecipe(recipe); //dodawanie przepisu do bazy
+
+        recipe = new Recipe("Kromka z maslem", "Posmaruj chleb masłem", new String[]{"chleb", "masło"},new String[]{"kromka","troszku"},null,null);
         myDBHandler.addRecipe(recipe);
 
-        recipe = new Recipe("Kromka z maslem", "Posmaruj chleb masłem", new String[]{"chleb", "masło"},new String[]{"kromka","troszku"});
-
-        myDBHandler.addRecipe(recipe);
-
-        ArrayList<Recipe> recipes = myDBHandler.listOfRecipes();
-
-
-        for (int i = 0; i < recipes.size();i++)
-        {
-            Log.i("TAG", "przepis: " + Integer.toString(recipes.get(i).get_id()) + " "  + recipes.get(i).getRecipename() + " " + recipes.get(i).getRecipredescription());
-        }
 
     }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu)

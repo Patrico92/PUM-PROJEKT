@@ -19,27 +19,57 @@ import java.util.List;
 
 public class MyDBHandler extends SQLiteOpenHelper {
 
-    private static final int DATABASE_VERSION = 2; //tutaj trzeba zmienić przy wprowadzaniu zmian do struktury bazy
+    private static final int DATABASE_VERSION = 6; //tutaj trzeba zmienić przy wprowadzaniu zmian do struktury bazy
+
     private static final String DATABASE_NAME = "database.db";
-    public static final String TABLE_NAME = "recipes";
+
+    public static final String TABLE_NAME_RECIPES = "recipes";
+    public static final String TABLE_NAME_INGREDIENTS = "ingredients";
+    public static final String TABLE_NAME_TASKS = "tasks";
+
     public static final String COLUMN_ID = "_id";
     public static final String COLUMN_RECIPE = "recipe";
     public static final String COLUMN_RECIPEDESCRIPTION = "recipedescription";
 
-    public MyDBHandler(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) throws IOException {
+    public static final String COLUMN_RECIPE_ID = "idrecipe";
+    public static final String COLUMN_INGREDIENT = "ingredient";
+    public static final String COLUMN_INGREDIENT_AMOUNT= "ingredientamount";
+
+    public static final String COLUMN_TASK = "task";
+    public static final String COLUMN_TASK_TIME= "tasktime";
+
+
+    public MyDBHandler(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {
         super(context, DATABASE_NAME, factory, DATABASE_VERSION);
     }
 
 
     @Override
-    public void onCreate(SQLiteDatabase db) {
-
-        Log.i("TAG", "onCreate");
-
-        String query = "CREATE TABLE " + TABLE_NAME + "( " +
+    public void onCreate(SQLiteDatabase db)
+    {
+        //tworzenie tabeli przepisow
+        String query = "CREATE TABLE " + TABLE_NAME_RECIPES + "( " +
                 COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 COLUMN_RECIPE + " TEXT, " +
                 COLUMN_RECIPEDESCRIPTION + " TEXT " +
+                ")" +" ;";
+        db.execSQL(query);
+
+        //tworzenie tabeli składników
+        query = "CREATE TABLE " + TABLE_NAME_INGREDIENTS + "( " +
+                COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                COLUMN_RECIPE_ID + " INTEGER, " +
+                COLUMN_INGREDIENT + " TEXT, " +
+                COLUMN_INGREDIENT_AMOUNT + " TEXT " +
+                ")" +" ;";
+        db.execSQL(query);
+
+        //tworzenie tabeli zadan do przepisów
+        query = "CREATE TABLE " + TABLE_NAME_TASKS + "( " +
+                COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                COLUMN_RECIPE_ID + " INTEGER, " +
+                COLUMN_TASK + " TEXT, " +
+                COLUMN_TASK_TIME + " INTEGER " + //czas zadania zapisujemy w tabeli w sekundach
                 ")" +" ;";
         db.execSQL(query);
 
@@ -47,48 +77,82 @@ public class MyDBHandler extends SQLiteOpenHelper {
 
 
     @Override
-    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-
-        Log.i("TAG", "onUpgrade");
-
-        db.execSQL("DROP TABLE IF EXISTS "+ TABLE_NAME);
+    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion)
+    {
+        db.execSQL("DROP TABLE IF EXISTS "+ TABLE_NAME_RECIPES);
+        db.execSQL("DROP TABLE IF EXISTS "+ TABLE_NAME_INGREDIENTS);
+        db.execSQL("DROP TABLE IF EXISTS "+ TABLE_NAME_TASKS);
         onCreate(db);
-
     }
+
     //dodawanie przepisu do bazy
     public void addRecipe(Recipe recipe)
     {
-
         ContentValues values = new ContentValues();
 
         values.put(COLUMN_RECIPE, recipe.getRecipename());
         values.put(COLUMN_RECIPEDESCRIPTION, recipe.getRecipredescription());
 
         SQLiteDatabase db = getWritableDatabase();
-        db.insert(TABLE_NAME,null,values);
+        db.insert(TABLE_NAME_RECIPES,null,values); //dodajemy nazwę i opis
 
-        //Cursor cursor = db.rawQuery("SELECT _id FROM " + TABLE_NAME + " WHERE " + COLUMN_RECIPE + " = " + recipe.getRecipename(),null );
-        //cursor.moveToFirst();
+        Cursor cursor = db.rawQuery("SELECT _id FROM " + TABLE_NAME_RECIPES + " WHERE " + COLUMN_RECIPE + " = '" + recipe.getRecipename() + "'", null );
+        cursor.moveToFirst();
 
-        //Log.i("TAG", "Id " + recipe.getRecipename() + Integer.toString(cursor.getInt(0)));
+        int recipeId = cursor.getInt(0);
+
+        String[] ingredients = recipe.getIngredients();
+        String[] ingredientsAmount = recipe.getIngredientsAmount();
+
+        String[] tasks = recipe.getTasks();
+        int[] taskstime = recipe.getTasksTime();
+
+        if(ingredients!=null)
+        {
+            for (int i = 0; i < ingredients.length; i++) //dodajemy składniki i ich ilosci
+            {
+                values = new ContentValues();
+
+                values.put(COLUMN_RECIPE_ID, recipeId);
+                values.put(COLUMN_INGREDIENT, ingredients[i]);
+                values.put(COLUMN_INGREDIENT_AMOUNT, ingredientsAmount[i]);
+
+                db.insert(TABLE_NAME_INGREDIENTS, null, values);
+            }
+        }
+
+        if(tasks != null)
+        {
+            for (int i = 0; i < tasks.length; i++) //dodajemy zadania i ich czasy trwania
+            {
+                values = new ContentValues();
+
+                values.put(COLUMN_RECIPE_ID, recipeId);
+                values.put(COLUMN_TASK, tasks[i]);
+                values.put(COLUMN_TASK_TIME, taskstime[i]);
+
+                db.insert(TABLE_NAME_INGREDIENTS, null, values);
+            }
+        }
 
         db.close();
     }
 
+    //pobieranie listy wszystkich przepisów będących w bazie
     public ArrayList<Recipe> listOfRecipes()
     {
 
         ArrayList<Recipe> recipes = new ArrayList<Recipe>();
 
         SQLiteDatabase db = getReadableDatabase();
-        Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_NAME, null);
+        Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_NAME_RECIPES, null);
 
         cursor.moveToFirst();
 
         while(!cursor.isAfterLast())
         {
 
-            Recipe recipe = new Recipe(cursor.getString(1),cursor.getString(2),null,null);
+            Recipe recipe = new Recipe(cursor.getString(1),cursor.getString(2),null,null,null,null);
             recipe.set_id(cursor.getInt(0));
             recipes.add(recipe);
             cursor.moveToNext();
@@ -99,16 +163,19 @@ public class MyDBHandler extends SQLiteOpenHelper {
         return recipes;
     }
 
+    //pobieranie przepisu z bazy po nazwie
     public Recipe getRecipe(String recipeName)
     {
 
         SQLiteDatabase db = getReadableDatabase();
-        Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_NAME + " WHERE " + COLUMN_RECIPE + " = " + recipeName, null);
+        Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_NAME_RECIPES + " WHERE " + COLUMN_RECIPE + " = " + recipeName, null);
         cursor.moveToFirst();
 
         Recipe recipe = new Recipe(
                 cursor.getString(1),
                 cursor.getString(2),
+                null,
+                null,
                 null,
                 null
         );

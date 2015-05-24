@@ -4,6 +4,11 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ListAdapter;
+import android.widget.ListView;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class RecipesList extends Activity {
@@ -11,7 +16,18 @@ public class RecipesList extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_recipes_list);
+
+        //tutaj konfiguracja portrait
+        setContentView(R.layout.recipes_list_portrait);
+
+        MyDBHandler myDBHandler = new MyDBHandler(this,null,null,0);
+
+        ArrayList<Recipe> recipes = myDBHandler.listOfRecipes();
+        ListAdapter listAdapter = new RowPortraitAdapter(this, recipes);
+
+        ListView recipesListPortait = (ListView) findViewById(R.id.recipesListPortrait);
+        recipesListPortait.setAdapter(listAdapter);
+
     }
 
 
