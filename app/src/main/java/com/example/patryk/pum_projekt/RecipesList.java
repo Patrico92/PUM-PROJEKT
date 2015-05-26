@@ -1,9 +1,12 @@
 package com.example.patryk.pum_projekt;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 
@@ -11,7 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class RecipesList extends Activity {
+public class RecipesList extends Activity implements ListView.OnItemClickListener {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,6 +29,7 @@ public class RecipesList extends Activity {
         ListAdapter listAdapter = new RowPortraitAdapter(this, recipes);
 
         ListView recipesListPortait = (ListView) findViewById(R.id.recipesListPortrait);
+        recipesListPortait.setOnItemClickListener(this);
         recipesListPortait.setAdapter(listAdapter);
 
     }
@@ -51,5 +55,15 @@ public class RecipesList extends Activity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+            Intent i = new Intent(this, RecipeDisplay.class);
+            Recipe recipe =  (Recipe) parent.getItemAtPosition(position);
+            i.putExtra("ID", recipe.get_id());
+            startActivity(i);
+
     }
 }

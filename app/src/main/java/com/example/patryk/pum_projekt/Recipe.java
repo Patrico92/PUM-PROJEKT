@@ -13,8 +13,7 @@ public class Recipe {
     private String[] tasks; //zadania do przepisu
     private int[] tasksTime; //czas trwania zadań (w sekundach)
 
-    Recipe(String recipename, String recipredescription, String[] ingredients,String[] ingredientsAmount,String[] tasks,int[] tasksTime)
-    {
+    Recipe(String recipename, String recipredescription, String[] ingredients,String[] ingredientsAmount,String[] tasks,int[] tasksTime) {
         this.recipename = recipename;
         this.recipredescription = recipredescription;
         this.ingredients = ingredients;
@@ -61,5 +60,26 @@ public class Recipe {
     public String[] getIngredients()
     {
         return ingredients;
+    }
+
+    @Override
+    public String toString() {
+
+        String recipe = "";
+
+        recipe += recipename + "\n";
+        recipe += recipredescription +"\n";
+
+        for(int i = 0; i < ingredients.length; i++)
+        {
+            recipe += ingredients[i] + " " + ingredientsAmount[i] + "\n";
+        }
+
+        for(int i = 0; i < tasks.length; i++)
+        {
+            recipe += tasks[i] + " " + Integer.toString(tasksTime[i]) + "\n";
+        }
+
+        return recipe;
     }
 }

@@ -19,7 +19,7 @@ import java.util.List;
 
 public class MyDBHandler extends SQLiteOpenHelper {
 
-    private static final int DATABASE_VERSION = 6; //tutaj trzeba zmienić przy wprowadzaniu zmian do struktury bazy
+    private static final int DATABASE_VERSION = 10; //tutaj trzeba zmienić przy wprowadzaniu zmian do struktury bazy
 
     private static final String DATABASE_NAME = "database.db";
 
@@ -85,10 +85,12 @@ public class MyDBHandler extends SQLiteOpenHelper {
         onCreate(db);
     }
 
-    //dodawanie przepisu do bazy
-    public void addRecipe(Recipe recipe)
+    //dodawanie przepisu do bazy, metoda zwróci "true" jeżeli zapis będzie udany
+    public boolean addRecipe(Recipe recipe)
     {
         ContentValues values = new ContentValues();
+
+        //tutaj trzeba sprawdzić, czy nie ma juz przepisu o takiej nazwie w bazie
 
         values.put(COLUMN_RECIPE, recipe.getRecipename());
         values.put(COLUMN_RECIPEDESCRIPTION, recipe.getRecipredescription());
@@ -131,11 +133,13 @@ public class MyDBHandler extends SQLiteOpenHelper {
                 values.put(COLUMN_TASK, tasks[i]);
                 values.put(COLUMN_TASK_TIME, taskstime[i]);
 
-                db.insert(TABLE_NAME_INGREDIENTS, null, values);
+                db.insert(TABLE_NAME_TASKS, null, values);
             }
         }
 
         db.close();
+
+        return true;
     }
 
     //pobieranie listy wszystkich przepisów będących w bazie
@@ -186,5 +190,68 @@ public class MyDBHandler extends SQLiteOpenHelper {
 
         return recipe;
 
+    }
+
+    public Recipe getRecipe(int _id){
+
+        SQLiteDatabase db = getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_NAME_RECIPES + " WHERE " + COLUMN_ID + " = " + _id, null);
+
+        if(!cursor.moveToFirst()) return null;
+
+        int recipeID = cursor.getInt(0);
+        String name = cursor.getString(1);
+        String description = cursor.getString(2);
+
+        cursor = db.rawQuery("SELECT * FROM " + TABLE_NAME_INGREDIENTS + " WHERE " + COLUMN_RECIPE_ID + " = " + _id, null);
+
+        cursor.moveToFirst();
+
+        ArrayList<String> ingredients = new ArrayList<String>();
+        ArrayList<String> ingredientsAmount = new ArrayList<String>();
+
+        while(!cursor.isAfterLast())
+        {
+            ingredients.add(cursor.getString(2));
+            ingredientsAmount.add(cursor.getString(3));
+            cursor.moveToNext();
+        }
+
+        ArrayList<String> tasks = new ArrayList<String>();
+        ArrayList<Integer> tasksTime = new ArrayList<Integer>();
+
+        cursor = db.rawQuery("SELECT * FROM " + TABLE_NAME_TASKS + " WHERE " + COLUMN_RECIPE_ID + " = " + _id, null);
+
+        cursor.moveToFirst();
+
+        while(!cursor.isAfterLast())
+        {
+            tasks.add(cursor.getString(2));
+            tasksTime.add(cursor.getInt(3));
+            cursor.moveToNext();
+        }
+
+        Recipe recipe = new Recipe(
+                name,
+                description,
+                ingredients.toArray(new String[ingredients.size()]),
+                ingredientsAmount.toArray(new String[ingredientsAmount.size()]),
+                tasks.toArray(new String[tasks.size()]),
+                listToArray(tasksTime)
+        );
+
+
+        return recipe;
+    }
+
+    private int[] listToArray(ArrayList<Integer> list){
+        int [] array = new int[list.size()];
+
+        for(int i = 0; i < list.size(); i++)
+        {
+            array[i] = list.get(i);
+        }
+
+        return array;
     }
 }

@@ -42,7 +42,7 @@ public class MainMenu extends Activity implements View.OnClickListener {
 
         myDBHandler = new MyDBHandler(this,null,null,0); //tworzymy handlera do obsługi bazy
 
-        Recipe recipe = new Recipe("Gotowany ryż", "Ugotuj ryż w wodzie przez 10 min", new String[]{"ryż", "woda"},new String[]{"paczka","litr"},null,null);
+        Recipe recipe = new Recipe("Gotowany ryż", "Ugotuj ryż w wodzie przez 10 min", new String[]{"ryż", "woda"},new String[]{"paczka","litr"},new String[]{"Gotuj ryż w wodzie"},new int[]{10*60});
         myDBHandler.addRecipe(recipe); //dodawanie przepisu do bazy
 
         recipe = new Recipe("Kromka z maslem", "Posmaruj chleb masłem", new String[]{"chleb", "masło"},new String[]{"kromka","troszku"},null,null);
