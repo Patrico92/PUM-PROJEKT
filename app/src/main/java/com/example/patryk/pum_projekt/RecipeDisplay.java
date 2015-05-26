@@ -11,6 +11,7 @@ import android.util.Log;
 import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -44,8 +45,6 @@ public class RecipeDisplay extends Activity {
                 r.getDisplayMetrics()
         );
 
-
-
         //tworzymy obrazek do naszego przepisu
         ImageView recipeImage = new ImageView(this);
         recipeImage.setId(1);
@@ -63,12 +62,12 @@ public class RecipeDisplay extends Activity {
         details.addRule(RelativeLayout.CENTER_HORIZONTAL);
         myLayout.addView(recipeImage,details);
 
-        //tworzymy miejsce na nazwę przepisy
 
-        TextView name = new TextView(this);
+
+        TextView name = new TextView(this);  //tworzymy miejsce na nazwę przepisu
         name.setText(recipe.getRecipename());
         name.setId(2);
-        name.setTypeface(null, Typeface.BOLD_ITALIC);
+        name.setTypeface(null, Typeface.BOLD);
 
         RelativeLayout.LayoutParams detailsTextName = new RelativeLayout.LayoutParams(
                 RelativeLayout.LayoutParams.WRAP_CONTENT,
@@ -81,7 +80,8 @@ public class RecipeDisplay extends Activity {
 
         myLayout.addView(name, detailsTextName);
 
-        TextView ingredientsText = new TextView(this);
+
+        TextView ingredientsText = new TextView(this);  //TextView wyświetlający napis: "Składniki"
         ingredientsText.setText("Składniki:");
         ingredientsText.setId(3);
 
@@ -101,7 +101,7 @@ public class RecipeDisplay extends Activity {
         String[] ingredients = recipe.getIngredients();
         String[] ingredientsAmount = recipe.getIngredientsAmount();
 
-        for(int i = 0; i < ingredients.length; i++)
+        for(int i = 0; i < ingredients.length; i++) // w tęj pętli dynamicznie tworzymy wyświetlanie składników
         {
             TextView ingredient = new TextView(this);
             ingredient.setText(ingredients[i] + " - " + ingredientsAmount[i]);
@@ -135,7 +135,42 @@ public class RecipeDisplay extends Activity {
 
         myLayout.addView(recipeDescriptionText, detailsTextDescription);
 
+        TextView tasksText = new TextView(this);
+        tasksText.setText("Zadania do wykonania:");
+        tasksText.setId(++id);
 
+        RelativeLayout.LayoutParams detailsTextTasks = new RelativeLayout.LayoutParams(
+                RelativeLayout.LayoutParams.WRAP_CONTENT,
+                RelativeLayout.LayoutParams.WRAP_CONTENT
+        );
+
+        detailsTextTasks.addRule(RelativeLayout.CENTER_HORIZONTAL);
+        detailsTextTasks.addRule(RelativeLayout.BELOW, id-1);
+        tasksText.setTextAppearance(this, android.R.style.TextAppearance_Medium);
+        tasksText.setTypeface(null, Typeface.BOLD);
+
+        myLayout.addView(tasksText, detailsTextTasks);
+
+        String[] tasks = recipe.getTasks();
+        int[] taskTime = recipe.getTasksTime();
+
+        for(int i = 0; i< tasks.length; i++) //buttony służace do uruchamiania zadań
+        {
+            Button taskButton = new Button(this);
+            taskButton.setId(++id);
+            taskButton.setText(tasks[i] + " " + timeDisplay(taskTime[i]));
+
+            RelativeLayout.LayoutParams detailsButtonTask = new RelativeLayout.LayoutParams(
+                    RelativeLayout.LayoutParams.WRAP_CONTENT,
+                    RelativeLayout.LayoutParams.WRAP_CONTENT
+            );
+
+            detailsButtonTask.addRule(RelativeLayout.CENTER_HORIZONTAL);
+            detailsButtonTask.addRule(RelativeLayout.BELOW, id-1);
+
+            myLayout.addView(taskButton, detailsButtonTask);
+
+        }
 
         sv.addView(myLayout);
         setContentView(sv);
@@ -166,6 +201,24 @@ public class RecipeDisplay extends Activity {
 
     private String timeDisplay(int time)
     {
-        return null;
+        String timeString="";
+        int hours = time/3600;
+        time -= hours*3600;
+        int minutes = time/60;
+        time -= minutes*60;
+
+        if (hours < 10 ) timeString+= "0" + Integer.toString(hours) + ":";
+        else timeString += Integer.toString(hours)+":";
+
+        if (minutes < 10 ) timeString+= "0" + Integer.toString(minutes) + ":";
+        else timeString += Integer.toString(minutes)+":";
+
+        if (time < 10 ) timeString+= "0" + Integer.toString(time);
+        else timeString += Integer.toString(time)+":";
+
+        return timeString;
+
+
+
     }
 }
