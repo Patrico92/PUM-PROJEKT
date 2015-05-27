@@ -19,7 +19,7 @@ import java.util.List;
 
 public class MyDBHandler extends SQLiteOpenHelper {
 
-    private static final int DATABASE_VERSION = 11; //tutaj trzeba zmienić przy wprowadzaniu zmian do struktury bazy
+    private static final int DATABASE_VERSION = 13; //tutaj trzeba zmienić przy wprowadzaniu zmian do struktury bazy
 
     private static final String DATABASE_NAME = "database.db";
 
@@ -72,9 +72,7 @@ public class MyDBHandler extends SQLiteOpenHelper {
                 COLUMN_TASK_TIME + " INTEGER " + //czas zadania zapisujemy w tabeli w sekundach
                 ")" +" ;";
         db.execSQL(query);
-
     }
-
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion)
@@ -90,15 +88,24 @@ public class MyDBHandler extends SQLiteOpenHelper {
     {
         ContentValues values = new ContentValues();
 
+        SQLiteDatabase db = getWritableDatabase();
+
+        Cursor cursor = db.rawQuery("SELECT _id FROM " + TABLE_NAME_RECIPES + " WHERE " + COLUMN_RECIPE + " = '" + recipe.getRecipename() + "'", null);
+
+        if (cursor.moveToFirst()) //sprawdzamu czy w bazie nie ma już przepisu o takiej nazwie
+        {
+            return false;
+        }
+
         //tutaj trzeba sprawdzić, czy nie ma juz przepisu o takiej nazwie w bazie
 
         values.put(COLUMN_RECIPE, recipe.getRecipename());
         values.put(COLUMN_RECIPEDESCRIPTION, recipe.getRecipredescription());
 
-        SQLiteDatabase db = getWritableDatabase();
+
         db.insert(TABLE_NAME_RECIPES,null,values); //dodajemy nazwę i opis
 
-        Cursor cursor = db.rawQuery("SELECT _id FROM " + TABLE_NAME_RECIPES + " WHERE " + COLUMN_RECIPE + " = '" + recipe.getRecipename() + "'", null );
+        cursor = db.rawQuery("SELECT _id FROM " + TABLE_NAME_RECIPES + " WHERE " + COLUMN_RECIPE + " = '" + recipe.getRecipename() + "'", null );
         cursor.moveToFirst();
 
         int recipeId = cursor.getInt(0);
@@ -187,6 +194,7 @@ public class MyDBHandler extends SQLiteOpenHelper {
         recipe.set_id(cursor.getInt(0));
 
         db.close();
+        cursor.close();
 
         return recipe;
 
@@ -240,8 +248,21 @@ public class MyDBHandler extends SQLiteOpenHelper {
                 listToArray(tasksTime)
         );
 
+        recipe.set_id(recipeID);
 
+        cursor.close();
         return recipe;
+    }
+
+    public boolean deleteRecipe(int id)
+    {
+        SQLiteDatabase db = getWritableDatabase();
+        db.delete(TABLE_NAME_RECIPES, COLUMN_ID + " = " + id, null);
+        db.delete(TABLE_NAME_TASKS, COLUMN_RECIPE_ID + " = " + id, null);
+        db.delete(TABLE_NAME_INGREDIENTS, COLUMN_RECIPE_ID + " = " + id, null);
+        db.close();
+
+        return true;
     }
 
     private int[] listToArray(ArrayList<Integer> list){
@@ -254,4 +275,5 @@ public class MyDBHandler extends SQLiteOpenHelper {
 
         return array;
     }
+
 }

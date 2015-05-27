@@ -62,8 +62,6 @@ public class RecipeDisplay extends Activity {
         details.addRule(RelativeLayout.CENTER_HORIZONTAL);
         myLayout.addView(recipeImage,details);
 
-
-
         TextView name = new TextView(this);  //tworzymy miejsce na nazwę przepisu
         name.setText(recipe.getRecipename());
         name.setId(2);
@@ -172,6 +170,8 @@ public class RecipeDisplay extends Activity {
 
         }
 
+        myDBHandler.deleteRecipe(recipeID);
+
         sv.addView(myLayout);
         setContentView(sv);
 
@@ -217,8 +217,6 @@ public class RecipeDisplay extends Activity {
         else timeString += Integer.toString(time)+":";
 
         return timeString;
-
-
 
     }
 }
