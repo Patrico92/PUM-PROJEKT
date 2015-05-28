@@ -47,7 +47,8 @@ public class RecipeDisplay extends Activity {
 
         //tworzymy obrazek do naszego przepisu
         ImageView recipeImage = new ImageView(this);
-        recipeImage.setId(1);
+        int id = 0;
+        recipeImage.setId(++id);
 
         recipeImage.setScaleType(ImageView.ScaleType.FIT_CENTER);
 
@@ -64,7 +65,7 @@ public class RecipeDisplay extends Activity {
 
         TextView name = new TextView(this);  //tworzymy miejsce na nazwę przepisu
         name.setText(recipe.getRecipename());
-        name.setId(2);
+        name.setId(++id);
         name.setTypeface(null, Typeface.BOLD);
 
         RelativeLayout.LayoutParams detailsTextName = new RelativeLayout.LayoutParams(
@@ -73,7 +74,7 @@ public class RecipeDisplay extends Activity {
         );
 
         detailsTextName.addRule(RelativeLayout.CENTER_HORIZONTAL);
-        detailsTextName.addRule(RelativeLayout.BELOW, 1);
+        detailsTextName.addRule(RelativeLayout.BELOW, id-1);
         name.setTextAppearance(this, android.R.style.TextAppearance_Large);
 
         myLayout.addView(name, detailsTextName);
@@ -81,7 +82,7 @@ public class RecipeDisplay extends Activity {
 
         TextView ingredientsText = new TextView(this);  //TextView wyświetlający napis: "Składniki"
         ingredientsText.setText("Składniki:");
-        ingredientsText.setId(3);
+        ingredientsText.setId(++id);
 
         RelativeLayout.LayoutParams detailsTextIngredients = new RelativeLayout.LayoutParams(
                 RelativeLayout.LayoutParams.WRAP_CONTENT,
@@ -89,12 +90,10 @@ public class RecipeDisplay extends Activity {
         );
 
         detailsTextIngredients.addRule(RelativeLayout.CENTER_HORIZONTAL);
-        detailsTextIngredients.addRule(RelativeLayout.BELOW, 2);
+        detailsTextIngredients.addRule(RelativeLayout.BELOW, id-1);
         ingredientsText.setTextAppearance(this, android.R.style.TextAppearance_Medium);
 
         myLayout.addView(ingredientsText, detailsTextIngredients);
-
-        int id = 3;
 
         String[] ingredients = recipe.getIngredients();
         String[] ingredientsAmount = recipe.getIngredientsAmount();
@@ -169,8 +168,6 @@ public class RecipeDisplay extends Activity {
             myLayout.addView(taskButton, detailsButtonTask);
 
         }
-
-        myDBHandler.deleteRecipe(recipeID);
 
         sv.addView(myLayout);
         setContentView(sv);
