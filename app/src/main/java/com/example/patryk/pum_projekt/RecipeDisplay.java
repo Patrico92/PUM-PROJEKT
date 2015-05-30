@@ -1,21 +1,44 @@
 package com.example.patryk.pum_projekt;
 
 import android.app.Activity;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.media.MediaPlayer;
+import android.media.RingtoneManager;
+import android.net.Uri;
+import android.provider.AlarmClock;
+import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import java.util.GregorianCalendar;
+import java.util.Timer;
+import java.util.TimerTask;
+
+import static com.example.patryk.pum_projekt.R.id.taskTime;
 
 
-public class RecipeDisplay extends Activity {
+public class RecipeDisplay extends Activity implements Button.OnClickListener {
+
+    int recipeID;
+    Timer timer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,7 +46,7 @@ public class RecipeDisplay extends Activity {
         super.onCreate(savedInstanceState);
 
         Bundle intent = getIntent().getExtras();
-        int recipeID = intent.getInt("ID");
+        recipeID = intent.getInt("ID");
 
         MyDBHandler myDBHandler = new MyDBHandler(this, null, null, 0);
 
@@ -31,7 +54,7 @@ public class RecipeDisplay extends Activity {
 
         RelativeLayout myLayout = new RelativeLayout(this);
         ScrollView sv = new ScrollView(this);
-        sv.setBackgroundColor(Color.rgb(139,69,19));
+        sv.setBackgroundColor(Color.rgb(205,133,63));
 
         Resources r = getResources();
 
@@ -42,13 +65,13 @@ public class RecipeDisplay extends Activity {
         );
 
         //tworzymy obrazek do naszego przepisu
-        ImageView recipeImage = new ImageView(this); //TODO
+        ImageView recipeImage = new ImageView(this);
         int id = 0;
         recipeImage.setId(++id);
 
         recipeImage.setScaleType(ImageView.ScaleType.FIT_CENTER);
 
-        recipeImage.setImageResource(R.drawable.recipe);
+        recipeImage.setImageResource(R.drawable.logo);
 
         RelativeLayout.LayoutParams details = new RelativeLayout.LayoutParams(
                 size,
@@ -151,6 +174,9 @@ public class RecipeDisplay extends Activity {
         {
             Button taskButton = new Button(this);
             taskButton.setId(++id);
+            taskButton.setTag(R.id.taskName, tasks[i]); //button przechowuje inforację o zadaniu
+            taskButton.setTag(R.id.taskTime, taskTime[i]); //przechowuje też informację o długości zadania
+            taskButton.setOnClickListener(this);
             taskButton.setText(tasks[i] + " " + timeDisplay(taskTime[i]));
 
             RelativeLayout.LayoutParams detailsButtonTask = new RelativeLayout.LayoutParams(
@@ -165,6 +191,8 @@ public class RecipeDisplay extends Activity {
 
         }
 
+        timer = new Timer();
+
         sv.addView(myLayout);
         setContentView(sv);
 
@@ -173,7 +201,7 @@ public class RecipeDisplay extends Activity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        //getMenuInflater().inflate(R.menu.menu_recipe_display, menu);
+        getMenuInflater().inflate(R.menu.menu_recipe_display, menu);
         return true;
     }
 
@@ -212,4 +240,25 @@ public class RecipeDisplay extends Activity {
         return timeString;
 
     }
+
+    @Override
+    public void onClick(View v) {
+
+        final Button button = (Button) findViewById(v.getId());
+        button.setText(button.getTag(R.id.taskName) + " zrobione!");
+
+        startTimer(button.getTag(R.id.taskName) + " zakonczone!", (Integer) button.getTag(R.id.taskTime));
+
+    }
+
+    public void startTimer(String message, int seconds) {
+        Intent intent = new Intent(AlarmClock.ACTION_SET_TIMER)
+                .putExtra(AlarmClock.EXTRA_MESSAGE, message)
+                .putExtra(AlarmClock.EXTRA_LENGTH, seconds)
+                .putExtra(AlarmClock.EXTRA_SKIP_UI, true);
+        if (intent.resolveActivity(getPackageManager()) != null) {
+            startActivity(intent);
+        }
+    }
+
 }

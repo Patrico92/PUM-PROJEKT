@@ -2,4 +2,6 @@
 <resources>
     <item name="recipeImage" type="id"></item>
     <item name="recipeNameText" type="id"></item>
+    <item name="taskName" type="id"></item>
+    <item name="taskTime" type="id"></item>
 </resources>
