@@ -54,7 +54,7 @@ public class RecipeDisplay extends Activity implements Button.OnClickListener {
 
         RelativeLayout myLayout = new RelativeLayout(this);
         ScrollView sv = new ScrollView(this);
-        sv.setBackgroundColor(Color.rgb(139,69,19));
+        sv.setBackgroundColor(Color.rgb(205,133,63));
 
         Resources r = getResources();
 
