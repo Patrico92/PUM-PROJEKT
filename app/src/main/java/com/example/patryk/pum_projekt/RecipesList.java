@@ -1,8 +1,11 @@
 package com.example.patryk.pum_projekt;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -14,8 +17,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class RecipesList extends Activity implements ListView.OnItemClickListener {
+public class RecipesList extends Activity implements ListView.OnItemClickListener, ListView.OnItemLongClickListener {
 
+
+    MyDBHandler myDBHandler;
+    ArrayList<Recipe> recipes;
+    ListView recipesListPortait;
+    RowPortraitAdapter listAdapter;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -23,14 +31,15 @@ public class RecipesList extends Activity implements ListView.OnItemClickListene
         //tutaj konfiguracja portrait
         setContentView(R.layout.recipes_list_portrait);
 
-        MyDBHandler myDBHandler = new MyDBHandler(this,null,null,0);
+        myDBHandler = new MyDBHandler(this,null,null,0);
 
-        ArrayList<Recipe> recipes = myDBHandler.listOfRecipes();
-        ListAdapter listAdapter = new RowPortraitAdapter(this, recipes);
+        listAdapter = new RowPortraitAdapter(this, myDBHandler.listOfRecipes());
 
-        ListView recipesListPortait = (ListView) findViewById(R.id.recipesListPortrait);
+        recipesListPortait = (ListView) findViewById(R.id.recipesListPortrait);
         recipesListPortait.setOnItemClickListener(this);
+        recipesListPortait.setOnItemLongClickListener(this);
         recipesListPortait.setAdapter(listAdapter);
+        recipesListPortait.requestFocus();
 
     }
 
@@ -58,6 +67,35 @@ public class RecipesList extends Activity implements ListView.OnItemClickListene
     }
 
     @Override
+    public boolean onItemLongClick(final AdapterView<?> parent, View view, final int position, long id) {
+
+        final int pos = position;
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+        builder.setMessage("Usuń lub edytuj przepis");
+
+        builder.setPositiveButton("Usuń przepis", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                Recipe recipeToDelete = (Recipe) parent.getItemAtPosition(position);
+                myDBHandler.deleteRecipe(recipeToDelete.get_id());
+                listAdapter.remove(recipeToDelete);
+                listAdapter.notifyDataSetChanged();
+
+            }
+        });
+        builder.setNegativeButton("Edytuj przepis", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                //kod do edytowania przepisów
+            }
+        });
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
+
+        return true;
+    }
+
+    @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
             Intent i = new Intent(this, RecipeDisplay.class);
@@ -66,4 +104,6 @@ public class RecipesList extends Activity implements ListView.OnItemClickListene
             startActivity(i);
 
     }
+
+
 }
