@@ -2,19 +2,12 @@ package com.example.patryk.pum_projekt;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.content.res.AssetManager;
+import android.content.res.TypedArray;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
 
 
 public class MainMenu extends Activity implements View.OnClickListener {
@@ -23,8 +16,10 @@ public class MainMenu extends Activity implements View.OnClickListener {
     String TAG = "tag"; //to jest pomocnicze, służy do wyświetlania logów w konsoli
     Button buttonCreate;
     Button buttonBase;
+    Button buttonNewRec;
     Recipe recipe;
     MyDBHandler myDBHandler;
+    ImageHandler imageHandler;
     private String line;
 
     @Override
@@ -40,12 +35,18 @@ public class MainMenu extends Activity implements View.OnClickListener {
         buttonCreate = (Button) findViewById(R.id.buttonCreate);
         buttonCreate.setOnClickListener(this);
 
+        buttonNewRec = (Button) findViewById(R.id.buttonNewRec);
+        buttonNewRec.setOnClickListener(this);
+
+        TypedArray initPhotos = getResources().obtainTypedArray(R.array.image_ids);
+        imageHandler = new ImageHandler();
+
         myDBHandler = new MyDBHandler(this,null,null,0); //tworzymy handlera do obsługi bazy
 
         Recipe recipe = new Recipe("Gotowany ryż", "Ugotuj ryż w wodzie przez 10 min", new String[]{"ryż", "woda"},new String[]{"paczka","litr"},new String[]{"Gotuj ryż w wodzie"},new int[]{10*60});
         myDBHandler.addRecipe(recipe); //dodawanie przepisu do bazy
 
-        recipe = new Recipe("Kromka z maslem", "Posmaruj chleb masłem", new String[]{"chleb", "masło"},new String[]{"kromka","troszku"},null,null);
+        recipe = new Recipe("Kromka z maslem", "Posmaruj chleb masłem" , new String[]{"chleb", "masło"},new String[]{"kromka","troszku"},null,null);
         myDBHandler.addRecipe(recipe);
 
 
@@ -84,6 +85,13 @@ public class MainMenu extends Activity implements View.OnClickListener {
             Intent i = new Intent(this, RecipesList.class);
             startActivity(i);
         }
+        if(v.getId() == buttonNewRec.getId())
+        {
+            Intent createNewRecipe = new Intent(this, CreateRecipe.class);
+            startActivity(createNewRecipe);
+        }
 
     }
+
+
 }

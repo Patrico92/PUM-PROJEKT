@@ -10,7 +10,7 @@ import java.util.ArrayList;
 
 public class MyDBHandler extends SQLiteOpenHelper {
 
-    private static final int DATABASE_VERSION = 13; //tutaj trzeba zmienić przy wprowadzaniu zmian do struktury bazy
+    private static final int DATABASE_VERSION = 15; //tutaj trzeba zmienić przy wprowadzaniu zmian do struktury bazy
 
     private static final String DATABASE_NAME = "database.db";
 

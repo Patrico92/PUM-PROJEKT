@@ -1,18 +1,14 @@
 package com.example.patryk.pum_projekt;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.Typeface;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
@@ -46,7 +42,7 @@ public class RecipeDisplay extends Activity {
         );
 
         //tworzymy obrazek do naszego przepisu
-        ImageView recipeImage = new ImageView(this);
+        ImageView recipeImage = new ImageView(this); //TODO
         int id = 0;
         recipeImage.setId(++id);
 
@@ -177,7 +173,7 @@ public class RecipeDisplay extends Activity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_recipe_display, menu);
+        //getMenuInflater().inflate(R.menu.menu_recipe_display, menu);
         return true;
     }
 

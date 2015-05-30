@@ -11,7 +11,6 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 
 import java.util.ArrayList;
-import java.util.List;
 
 
 public class RecipesList extends Activity implements ListView.OnItemClickListener {

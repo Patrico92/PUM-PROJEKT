@@ -9,4 +9,23 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="addRecipeButton">Dodaj swój własny przepis!</string>
     <string name="title_activity_recipe_display">RecipeDisplay</string>
+    <string name="btn_new_rec">Dodaj nowy przepis</string>
+    <string name="create_instruction">Stwórz własny przepis</string>
+    <string name="create_title">nazwa przepisu</string>
+    <string name="add_ingredient">dodaj składnik</string>
+    <string name="btn_add_ingredient">Dodaj</string>
+    <string name="create_desc">Instrukcje</string>
+    <string name="add_ingredient_amount">dodaj ilość</string>
+    <string name="get_gallery_picture">załaduj zdjęcie z telefonu</string>
+    <string name="take_photo">Zrób zdjęcie</string>
+    <string name="finish_creating">Stwórz</string>
+    <string name="deleteIngredient">Usuń</string>
+    <string name="alarms">alarmy</string>
+    <string name="dialog_alarm_time">czas alarmu</string>
+    <string name="dialog_alarm_name">nazwa alarmu</string>
+    <string name="create_alarm">stwórz alarm</string>
+    <string name="cancel">anuluj</string>
+    <string name="set_new_alarm">Dodaj nowy alarm</string>
+    <string name="remove_last_alarm">usuń alarm</string>
+    <string name="set_alarm_dialog">ustaw tytuł alarmu i jego czas</string>
 </resources>
