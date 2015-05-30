@@ -33,7 +33,7 @@ class RowPortraitAdapter extends ArrayAdapter<Recipe> {
         ImageView recipePhoto = (ImageView) customView.findViewById(R.id.recipePhoto);
 
         recipeName.setText(singleRecipe.getRecipename());
-        recipePhoto.setImageResource(R.drawable.recipe);
+        recipePhoto.setImageResource(R.drawable.logo);
 
         return customView;
     }

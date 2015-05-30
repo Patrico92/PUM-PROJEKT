@@ -71,7 +71,7 @@ public class RecipeDisplay extends Activity implements Button.OnClickListener {
 
         recipeImage.setScaleType(ImageView.ScaleType.FIT_CENTER);
 
-        recipeImage.setImageResource(R.drawable.recipe);
+        recipeImage.setImageResource(R.drawable.logo);
 
         RelativeLayout.LayoutParams details = new RelativeLayout.LayoutParams(
                 size,
