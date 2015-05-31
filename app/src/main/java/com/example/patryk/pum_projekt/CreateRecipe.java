@@ -114,6 +114,7 @@ public class CreateRecipe extends Activity implements View.OnClickListener {
 
         if(!editRecipe.getRecipePath().equals(""))
         {
+            imgPath = editRecipe.getRecipePath();
             img.setImageBitmap(decodeFile(editRecipe.getRecipePath()));
         }
 
