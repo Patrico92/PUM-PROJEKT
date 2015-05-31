@@ -1,5 +1,7 @@
 package com.example.patryk.pum_projekt;
 
+import java.util.ArrayList;
+
 /**
  * Created by patryk on 17.05.15.
  */
@@ -87,5 +89,17 @@ public class Recipe {
         }
 
         return recipe;
+    }
+
+    public ArrayList<String> getAllIngredients()
+    {
+        ArrayList<String> result = new ArrayList<>();
+
+        for(int i = 0; i < ingredients.length; i++)
+        {
+            result.add(ingredients[i] + " " + ingredientsAmount[i]);
+        }
+
+        return result;
     }
 }

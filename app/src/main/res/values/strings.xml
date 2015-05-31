@@ -29,4 +29,5 @@
     <string name="remove_last_alarm">usuń alarm</string>
     <string name="set_alarm_dialog">ustaw tytuł alarmu i jego czas</string>
     <string name="ButtonEdit">Edytuj</string>
+    <string name="title_activity_shopping_list">ShoppingList</string>
 </resources>

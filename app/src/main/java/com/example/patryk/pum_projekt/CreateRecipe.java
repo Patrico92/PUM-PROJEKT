@@ -33,7 +33,6 @@ import java.util.LinkedList;
 public class CreateRecipe extends Activity implements View.OnClickListener {
 
 
-
     private MyDBHandler myDBHandler;
     Button buttonAddIngredient, buttonAddAlarm, buttonRemoveAlarm, buttonGalleryImg, buttonPhotoImg,
     buttonSave;
@@ -98,7 +97,6 @@ public class CreateRecipe extends Activity implements View.OnClickListener {
 
 
         editId = getIntent().getIntExtra("id", -1);
-        Log.i("CreateRecipe", "editID = " + editId);
         if (editId != -1) {
             Recipe editRecipe = myDBHandler.getRecipe(editId);
             loadRecipe(editRecipe);

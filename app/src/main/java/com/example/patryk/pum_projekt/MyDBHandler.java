@@ -10,19 +10,19 @@ import java.util.ArrayList;
 
 public class MyDBHandler extends SQLiteOpenHelper {
 
-    private static final int DATABASE_VERSION = 18; //tutaj trzeba zmienić przy wprowadzaniu zmian do struktury bazy
+    private static final int DATABASE_VERSION = 19; //tutaj trzeba zmienić przy wprowadzaniu zmian do struktury bazy
 
     private static final String DATABASE_NAME = "database.db";
 
     public static final String TABLE_NAME_RECIPES = "recipes";
     public static final String TABLE_NAME_INGREDIENTS = "ingredients";
     public static final String TABLE_NAME_TASKS = "tasks";
+    public static final String TABLE_SHOPPINGLIST_NAME = "shoppinglist";
 
     public static final String COLUMN_ID = "_id";
     public static final String COLUMN_RECIPE = "recipe";
     public static final String COLUMN_RECIPEDESCRIPTION = "recipedescription";
     private static final String COLUMN_RECIPEPATH = "recipepath";
-
 
     public static final String COLUMN_RECIPE_ID = "idrecipe";
     public static final String COLUMN_INGREDIENT = "ingredient";
@@ -30,6 +30,8 @@ public class MyDBHandler extends SQLiteOpenHelper {
 
     public static final String COLUMN_TASK = "task";
     public static final String COLUMN_TASK_TIME= "tasktime";
+
+    public static final String COLUMN_SHOPPING_ITEM = "item";
 
 
     public MyDBHandler(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {
@@ -66,6 +68,15 @@ public class MyDBHandler extends SQLiteOpenHelper {
                 COLUMN_TASK_TIME + " INTEGER " + //czas zadania zapisujemy w tabeli w sekundach
                 ")" +" ;";
         db.execSQL(query);
+
+        //tworzenie tabeli zadan do przepisów
+        query = "CREATE TABLE " + TABLE_SHOPPINGLIST_NAME + "( " +
+                COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                COLUMN_SHOPPING_ITEM + " TEXT " +
+                ")" +" ;";
+        db.execSQL(query);
+
+
     }
 
     @Override
@@ -86,7 +97,7 @@ public class MyDBHandler extends SQLiteOpenHelper {
 
         Cursor cursor = db.rawQuery("SELECT _id FROM " + TABLE_NAME_RECIPES + " WHERE " + COLUMN_RECIPE + " = '" + recipe.getRecipename() + "'", null);
 
-        if (cursor.moveToFirst()) //sprawdzamu czy w bazie nie ma już przepisu o takiej nazwie
+        if (cursor.moveToFirst()) //sprawdzamy czy w bazie nie ma już przepisu o takiej nazwie
         {
             return false;
         }
@@ -168,6 +179,59 @@ public class MyDBHandler extends SQLiteOpenHelper {
         db.close();
 
         return recipes;
+    }
+
+    public void addShoppingItem(String item)
+    {
+
+        ContentValues cv = new ContentValues();
+        SQLiteDatabase db = getWritableDatabase();
+
+        cv.put(COLUMN_SHOPPING_ITEM, item);
+        db.insert(TABLE_SHOPPINGLIST_NAME, null,cv);
+
+        db.close();
+
+    }
+
+    public void deleteShoppingItem(int id)
+    {
+        SQLiteDatabase db = getWritableDatabase();
+
+        db.delete(TABLE_SHOPPINGLIST_NAME, COLUMN_ID + " = " + id, null);
+
+        db.close();
+
+    }
+
+    public ArrayList<String> getShoppingList()
+    {
+        ArrayList<String> items = new ArrayList<>();
+
+        SQLiteDatabase db = getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_SHOPPINGLIST_NAME, null);
+        cursor.moveToFirst();
+
+        while(!cursor.isAfterLast())
+        {
+            items.add(cursor.getString(1));
+            cursor.moveToNext();
+        }
+
+        cursor.close();
+        db.close();
+
+        return items;
+    }
+
+    public void deleteShoppingList()
+    {
+        SQLiteDatabase db = getWritableDatabase();
+
+        db.delete(TABLE_SHOPPINGLIST_NAME, null, null);
+
+        db.close();
+
     }
 
     //pobieranie przepisu z bazy po nazwie
@@ -263,6 +327,7 @@ public class MyDBHandler extends SQLiteOpenHelper {
 
         return true;
     }
+
     public boolean editRecipe(int id, Recipe recipe) {
         ContentValues cv = new ContentValues();
         SQLiteDatabase db = getWritableDatabase();

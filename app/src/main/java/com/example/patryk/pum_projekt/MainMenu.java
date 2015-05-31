@@ -11,11 +11,8 @@ import android.widget.Button;
 
 public class MainMenu extends Activity implements View.OnClickListener {
 
-
-    String TAG = "tag"; //to jest pomocnicze, służy do wyświetlania logów w konsoli
-    Button buttonCreate;
+    Button buttonShoppingList;
     Button buttonBase;
-    Recipe recipe;
     MyDBHandler myDBHandler;
 
 
@@ -29,9 +26,8 @@ public class MainMenu extends Activity implements View.OnClickListener {
         buttonBase = (Button) findViewById(R.id.buttonBase);
         buttonBase.setOnClickListener(this);
 
-        buttonCreate = (Button) findViewById(R.id.buttonCreate);
-        buttonCreate.setOnClickListener(this);
-
+        buttonShoppingList = (Button) findViewById(R.id.buttonCreate);
+        buttonShoppingList.setOnClickListener(this);
 
 
         myDBHandler = new MyDBHandler(this,null,null,0); //tworzymy handlera do obsługi bazy
@@ -75,6 +71,9 @@ public class MainMenu extends Activity implements View.OnClickListener {
         if(v.getId() == buttonBase.getId())
         {
             Intent i = new Intent(this, RecipesList.class);
+            startActivity(i);
+        } else {
+            Intent i = new Intent(this, ShoppingList.class);
             startActivity(i);
         }
     }

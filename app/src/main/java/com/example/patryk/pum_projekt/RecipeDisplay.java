@@ -19,6 +19,7 @@ import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
+import java.util.ArrayList;
 import java.util.Timer;
 
 
@@ -26,6 +27,7 @@ public class RecipeDisplay extends Activity implements Button.OnClickListener {
 
     int recipeID;
     Timer timer;
+    Recipe recipe;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,9 +37,9 @@ public class RecipeDisplay extends Activity implements Button.OnClickListener {
         Bundle intent = getIntent().getExtras();
         recipeID = intent.getInt("ID");
 
-        MyDBHandler myDBHandler = new MyDBHandler(this, null, null, 0);
+        final MyDBHandler myDBHandler = new MyDBHandler(this, null, null, 0);
 
-        Recipe recipe = myDBHandler.getRecipe(recipeID);
+        recipe = myDBHandler.getRecipe(recipeID);
 
         RelativeLayout myLayout = new RelativeLayout(this);
         ScrollView sv = new ScrollView(this);
@@ -69,6 +71,8 @@ public class RecipeDisplay extends Activity implements Button.OnClickListener {
                 size
         );
 
+        details.setMargins(10,10,10,10);
+
         details.addRule(RelativeLayout.ALIGN_PARENT_TOP);
         details.addRule(RelativeLayout.CENTER_HORIZONTAL);
         myLayout.addView(recipeImage,details);
@@ -85,10 +89,10 @@ public class RecipeDisplay extends Activity implements Button.OnClickListener {
 
         detailsTextName.addRule(RelativeLayout.CENTER_HORIZONTAL);
         detailsTextName.addRule(RelativeLayout.BELOW, id-1);
+        detailsTextName.setMargins(5,5,5,5);
         name.setTextAppearance(this, android.R.style.TextAppearance_Large);
 
         myLayout.addView(name, detailsTextName);
-
 
         TextView ingredientsText = new TextView(this);  //TextView wyświetlający napis: "Składniki"
         ingredientsText.setText("Składniki:");
@@ -102,7 +106,7 @@ public class RecipeDisplay extends Activity implements Button.OnClickListener {
         detailsTextIngredients.addRule(RelativeLayout.CENTER_HORIZONTAL);
         detailsTextIngredients.addRule(RelativeLayout.BELOW, id-1);
         ingredientsText.setTextAppearance(this, android.R.style.TextAppearance_Medium);
-
+        detailsTextIngredients.setMargins(5,5,5,5);
         myLayout.addView(ingredientsText, detailsTextIngredients);
 
         String[] ingredients = recipe.getIngredients();
@@ -111,7 +115,13 @@ public class RecipeDisplay extends Activity implements Button.OnClickListener {
         for(int i = 0; i < ingredients.length; i++) // w tęj pętli dynamicznie tworzymy wyświetlanie składników
         {
             TextView ingredient = new TextView(this);
-            ingredient.setText(ingredients[i] + " - " + ingredientsAmount[i]);
+            if(ingredientsAmount[i].equals(("")))
+            {
+                ingredient.setText(ingredients[i]);
+            } else {
+                ingredient.setText(ingredients[i] + " - " + ingredientsAmount[i]);
+            }
+
             ingredient.setId(++id);
 
             RelativeLayout.LayoutParams detailsTextIngredient = new RelativeLayout.LayoutParams(
@@ -137,6 +147,9 @@ public class RecipeDisplay extends Activity implements Button.OnClickListener {
 
         detailsTextDescription.addRule(RelativeLayout.CENTER_HORIZONTAL);
         detailsTextDescription.addRule(RelativeLayout.BELOW, id-1);
+        detailsTextDescription.setMargins(5,10,5,5);
+        recipeDescriptionText.setPadding(10,10,10,10);
+
         recipeDescriptionText.setTextAppearance(this, android.R.style.TextAppearance_Large);
         recipeDescriptionText.setTypeface(null, Typeface.ITALIC);
 
@@ -181,6 +194,41 @@ public class RecipeDisplay extends Activity implements Button.OnClickListener {
             myLayout.addView(taskButton, detailsButtonTask);
 
         }
+
+        Button createShoppingList = new Button(this);
+        createShoppingList.setId(++id);
+
+        createShoppingList.setText("Dodaj składniki do listy zakupów");
+
+        RelativeLayout.LayoutParams detailsButtonShoppingList = new RelativeLayout.LayoutParams(
+                RelativeLayout.LayoutParams.WRAP_CONTENT,
+                RelativeLayout.LayoutParams.WRAP_CONTENT
+        );
+
+        detailsButtonShoppingList.addRule(RelativeLayout.CENTER_HORIZONTAL);
+        detailsButtonShoppingList.addRule(RelativeLayout.BELOW, id-1);
+
+        createShoppingList.setOnClickListener(
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+
+                        ArrayList<String> ingredientsToBuy = recipe.getAllIngredients();
+
+                        for (String ingredient : ingredientsToBuy)
+                        {
+                            myDBHandler.addShoppingItem(ingredient);
+                        }
+
+                        Button thisButton = (Button) findViewById(v.getId());
+                        thisButton.setText("Składniki dodane do listy zakupów!");
+
+                    }
+                }
+        );
+
+        myLayout.addView(createShoppingList, detailsButtonShoppingList);
+
 
         timer = new Timer();
 
@@ -238,9 +286,10 @@ public class RecipeDisplay extends Activity implements Button.OnClickListener {
         final Button button = (Button) findViewById(v.getId());
         button.setText(button.getTag(R.id.taskName) + " zrobione!");
 
-        startTimer(button.getTag(R.id.taskName) + " zakonczone!", (Integer) button.getTag(R.id.taskTime));
+        startTimer((String) button.getTag(R.id.taskName), (Integer) button.getTag(R.id.taskTime));
 
     }
+
     public Bitmap decodeFile(String path) {
         try {
             // Decode image size

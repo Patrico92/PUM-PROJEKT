@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -18,26 +19,43 @@ public class RecipesList extends Activity implements ListView.OnItemClickListene
 
 
     MyDBHandler myDBHandler;
-    ListView recipesListPortait;
+    ListView recipesList;
     RowPortraitAdapter listAdapter;
+    RowLandscapeAdapter listLandAdapter;
+    Button buttonAddRecipe;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        //tutaj konfiguracja portrait
-        setContentView(R.layout.recipes_list_portrait);
-
         myDBHandler = new MyDBHandler(this,null,null,0);
 
-        listAdapter = new RowPortraitAdapter(this, myDBHandler.listOfRecipes());
+        if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT)
+        {
+            setContentView(R.layout.recipes_list_portrait);
 
-        recipesListPortait = (ListView) findViewById(R.id.recipesListPortrait);
-        recipesListPortait.setOnItemClickListener(this);
-        recipesListPortait.setOnItemLongClickListener(this);
-        recipesListPortait.setAdapter(listAdapter);
-        recipesListPortait.requestFocus();
+            listAdapter = new RowPortraitAdapter(this, myDBHandler.listOfRecipes());
 
-        Button buttonAddRecipe =(Button) findViewById(R.id.buttonAddRecipe);
+            recipesList = (ListView) findViewById(R.id.recipesListPortrait);
+            recipesList.setAdapter(listAdapter);
+            buttonAddRecipe =(Button) findViewById(R.id.buttonAddRecipe);
+
+        } else
+        {
+            setContentView(R.layout.recipes_list_landscape);
+
+            listLandAdapter = new RowLandscapeAdapter(this, myDBHandler.listOfRecipes());
+
+            recipesList = (ListView) findViewById(R.id.recipesListLandscape);
+            recipesList.setAdapter(listLandAdapter);
+            buttonAddRecipe = (Button) findViewById(R.id.addRecipeLand);
+        }
+
+        recipesList.setOnItemClickListener(this);
+        recipesList.setOnItemLongClickListener(this);
+
+        recipesList.requestFocus();
+
+
         buttonAddRecipe.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -47,8 +65,6 @@ public class RecipesList extends Activity implements ListView.OnItemClickListene
         });
 
     }
-
-
 
 
     @Override
@@ -82,11 +98,18 @@ public class RecipesList extends Activity implements ListView.OnItemClickListene
 
         builder.setPositiveButton("Usuń przepis", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
+
                 Recipe recipeToDelete = (Recipe) parent.getItemAtPosition(position);
                 myDBHandler.deleteRecipe(recipeToDelete.get_id());
-                Log.i("RecipesList", "to delete recipe id" + recipeToDelete.get_id());
-                listAdapter.remove(recipeToDelete);
-                listAdapter.notifyDataSetChanged();
+
+                if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+
+                    listAdapter.remove(recipeToDelete);
+                    listAdapter.notifyDataSetChanged();
+                } else {
+                    listLandAdapter.remove(recipeToDelete);
+                    listLandAdapter.notifyDataSetChanged();
+                }
 
             }
         });
