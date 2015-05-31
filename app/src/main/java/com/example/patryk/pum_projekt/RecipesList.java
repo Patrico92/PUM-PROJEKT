@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -12,14 +13,11 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
 
-import java.util.ArrayList;
-
 
 public class RecipesList extends Activity implements ListView.OnItemClickListener, ListView.OnItemLongClickListener  {
 
 
     MyDBHandler myDBHandler;
-    ArrayList<Recipe> recipes;
     ListView recipesListPortait;
     RowPortraitAdapter listAdapter;
     @Override
@@ -78,7 +76,6 @@ public class RecipesList extends Activity implements ListView.OnItemClickListene
     @Override
     public boolean onItemLongClick(final AdapterView<?> parent, View view, final int position, long id) {
 
-        final int pos = position;
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
         builder.setMessage("Usuń lub edytuj przepis");
@@ -87,6 +84,7 @@ public class RecipesList extends Activity implements ListView.OnItemClickListene
             public void onClick(DialogInterface dialog, int id) {
                 Recipe recipeToDelete = (Recipe) parent.getItemAtPosition(position);
                 myDBHandler.deleteRecipe(recipeToDelete.get_id());
+                Log.i("RecipesList", "to delete recipe id" + recipeToDelete.get_id());
                 listAdapter.remove(recipeToDelete);
                 listAdapter.notifyDataSetChanged();
 
@@ -98,8 +96,8 @@ public class RecipesList extends Activity implements ListView.OnItemClickListene
                 Recipe recipeToEdit = (Recipe) parent.getItemAtPosition(position);
 
                 Intent i = new Intent(RecipesList.this ,CreateRecipe.class);
-                Bundle extras = i.getExtras();
-                extras.putInt("id",recipeToEdit.get_id());
+
+                i.putExtra("id", recipeToEdit.get_id());
                 RecipesList.this.startActivity(i);
 
             }

@@ -14,6 +14,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.text.InputType;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
 import android.widget.Button;
@@ -49,19 +50,17 @@ public class CreateRecipe extends Activity implements View.OnClickListener {
     private boolean edit = false;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState)
-    {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_recipe_add);
 
         ingredientList = (ListView) findViewById(R.id.IngredientsList);
         ingredientList.addHeaderView(getLayoutInflater().inflate(R.layout.activity_recipe_add_header, ingredientList, false));
-
+        ingredientList.addFooterView(getLayoutInflater().inflate(R.layout.activity_recipe_add_footer,ingredientList, false));
 
         ingredients = new ArrayList<>();
         adapter = new IngredientListAdapter(this, R.layout.create_ingredient_view, ingredients);
         ingredientList.setAdapter(adapter);
-
 
 
         myDBHandler = new MyDBHandler(this, null, null, 0);
@@ -80,9 +79,8 @@ public class CreateRecipe extends Activity implements View.OnClickListener {
         buttonSave.setOnClickListener(this);
 
 
-
         editAmount = (EditText) findViewById(R.id.EditTextAmount);
-        editIngredient  = (EditText) findViewById(R.id.EditTextIngredient);
+        editIngredient = (EditText) findViewById(R.id.EditTextIngredient);
         editName = (EditText) findViewById(R.id.EditTextTitle);
         editDesc = (EditText) findViewById(R.id.EditTextDesc);
         //setListViewHeightBasedOnChildren(ingredientList);
@@ -98,15 +96,15 @@ public class CreateRecipe extends Activity implements View.OnClickListener {
         img.setMaxHeight(250);
         img.setMaxWidth(250);
 
-        Bundle extras = getIntent().getExtras();
-        if(extras!=null) {
-            editId = extras.getInt("id", -1);
-            if (editId == -1) {
-                Recipe editRecipe = myDBHandler.getRecipe(editId);
-                loadRecipe(editRecipe);
-                edit = true;
-            }
+
+        editId = getIntent().getIntExtra("id", -1);
+        Log.i("CreateRecipe", "editID = " + editId);
+        if (editId != -1) {
+            Recipe editRecipe = myDBHandler.getRecipe(editId);
+            loadRecipe(editRecipe);
+            edit = true;
         }
+
 
     }
 
@@ -204,7 +202,7 @@ public class CreateRecipe extends Activity implements View.OnClickListener {
 
             alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int whichButton) {
-                    String alarmTimeString = "1";
+                    String alarmTimeString;
                     String alarmString = alarmName.getText().toString();
                     alarmTimeString = alarmTime.getText().toString();
 
@@ -257,7 +255,8 @@ public class CreateRecipe extends Activity implements View.OnClickListener {
             else {
                 myDBHandler.addRecipe(newRecipe);
             }
-            finish();
+            Intent i = new Intent(this, RecipesList.class);
+            startActivity(i);
 
         }
 

@@ -25,14 +25,6 @@
         android:layout_centerHorizontal="true"
         android:padding="10dp" />
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Stwórz listę zakupów"
-        android:id="@+id/buttonNewRec"
-        android:layout_below="@+id/buttonCreate"
-        android:layout_centerHorizontal="true"
-        android:padding="10dp" />
 
     <ImageView
         android:layout_width="300dp"

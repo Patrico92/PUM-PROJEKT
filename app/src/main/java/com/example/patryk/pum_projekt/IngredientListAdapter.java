@@ -26,7 +26,6 @@ public class IngredientListAdapter extends ArrayAdapter<Ingredient> {
     }
 
     private class IngredientHolder {
-        IngredientHolder(){};
         Ingredient ingredient;
         TextView name;
         TextView amount;
@@ -34,8 +33,8 @@ public class IngredientListAdapter extends ArrayAdapter<Ingredient> {
     }
 
     public View getView(int position, View convertView, ViewGroup parent) {
-        View row = convertView;
-        IngredientHolder holder = null;
+        View row;
+        IngredientHolder holder;
 
         LayoutInflater inflater = ((Activity) context).getLayoutInflater();
         row = inflater.inflate(resource, parent, false);

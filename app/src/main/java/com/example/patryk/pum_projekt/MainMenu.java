@@ -15,7 +15,6 @@ public class MainMenu extends Activity implements View.OnClickListener {
     String TAG = "tag"; //to jest pomocnicze, służy do wyświetlania logów w konsoli
     Button buttonCreate;
     Button buttonBase;
-    Button buttonNewRec;
     Recipe recipe;
     MyDBHandler myDBHandler;
 
@@ -33,8 +32,6 @@ public class MainMenu extends Activity implements View.OnClickListener {
         buttonCreate = (Button) findViewById(R.id.buttonCreate);
         buttonCreate.setOnClickListener(this);
 
-        buttonNewRec = (Button) findViewById(R.id.buttonNewRec);
-        buttonNewRec.setOnClickListener(this);
 
 
         myDBHandler = new MyDBHandler(this,null,null,0); //tworzymy handlera do obsługi bazy
@@ -75,18 +72,11 @@ public class MainMenu extends Activity implements View.OnClickListener {
     @Override
     public void onClick(View v)
     {
-
         if(v.getId() == buttonBase.getId())
         {
             Intent i = new Intent(this, RecipesList.class);
             startActivity(i);
         }
-        if(v.getId() == buttonNewRec.getId())
-        {
-            Intent createNewRecipe = new Intent(this, CreateRecipe.class);
-            startActivity(createNewRecipe);
-        }
-
     }
 
 

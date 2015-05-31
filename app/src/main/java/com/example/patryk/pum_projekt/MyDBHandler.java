@@ -138,7 +138,7 @@ public class MyDBHandler extends SQLiteOpenHelper {
                 db.insert(TABLE_NAME_TASKS, null, values);
             }
         }
-
+        cursor.close();
         db.close();
 
         return true;
@@ -148,7 +148,7 @@ public class MyDBHandler extends SQLiteOpenHelper {
     public ArrayList<Recipe> listOfRecipes()
     {
 
-        ArrayList<Recipe> recipes = new ArrayList<Recipe>();
+        ArrayList<Recipe> recipes = new ArrayList<>();
 
         SQLiteDatabase db = getReadableDatabase();
         Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_NAME_RECIPES, null);
@@ -164,6 +164,7 @@ public class MyDBHandler extends SQLiteOpenHelper {
             cursor.moveToNext();
         }
 
+        cursor.close();
         db.close();
 
         return recipes;
@@ -212,8 +213,8 @@ public class MyDBHandler extends SQLiteOpenHelper {
 
         cursor.moveToFirst();
 
-        ArrayList<String> ingredients = new ArrayList<String>();
-        ArrayList<String> ingredientsAmount = new ArrayList<String>();
+        ArrayList<String> ingredients = new ArrayList<>();
+        ArrayList<String> ingredientsAmount = new ArrayList<>();
 
         while(!cursor.isAfterLast())
         {
@@ -222,8 +223,8 @@ public class MyDBHandler extends SQLiteOpenHelper {
             cursor.moveToNext();
         }
 
-        ArrayList<String> tasks = new ArrayList<String>();
-        ArrayList<Integer> tasksTime = new ArrayList<Integer>();
+        ArrayList<String> tasks = new ArrayList<>();
+        ArrayList<Integer> tasksTime = new ArrayList<>();
 
         cursor = db.rawQuery("SELECT * FROM " + TABLE_NAME_TASKS + " WHERE " + COLUMN_RECIPE_ID + " = " + _id, null);
 
