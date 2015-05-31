@@ -2,7 +2,6 @@ package com.example.patryk.pum_projekt;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.content.res.TypedArray;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -19,8 +18,7 @@ public class MainMenu extends Activity implements View.OnClickListener {
     Button buttonNewRec;
     Recipe recipe;
     MyDBHandler myDBHandler;
-    ImageHandler imageHandler;
-    private String line;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -38,15 +36,13 @@ public class MainMenu extends Activity implements View.OnClickListener {
         buttonNewRec = (Button) findViewById(R.id.buttonNewRec);
         buttonNewRec.setOnClickListener(this);
 
-        TypedArray initPhotos = getResources().obtainTypedArray(R.array.image_ids);
-        imageHandler = new ImageHandler();
 
         myDBHandler = new MyDBHandler(this,null,null,0); //tworzymy handlera do obsługi bazy
 
-        Recipe recipe = new Recipe("Gotowany ryż", "Ugotuj ryż w wodzie przez 10 min", new String[]{"ryż", "woda"},new String[]{"paczka","litr"},new String[]{"Gotuj ryż w wodzie"},new int[]{10*60});
+        Recipe recipe = new Recipe("Gotowany ryż", "Ugotuj ryż w wodzie przez 10 min", "" , new String[]{"ryż", "woda"},new String[]{"paczka","litr"},new String[]{"Gotuj ryż w wodzie"},new int[]{10*60});
         myDBHandler.addRecipe(recipe); //dodawanie przepisu do bazy
 
-        recipe = new Recipe("Kromka z maslem", "Posmaruj chleb masłem" , new String[]{"chleb", "masło"},new String[]{"kromka","troszku"},null,null);
+        recipe = new Recipe("Kromka z maslem", "Posmaruj chleb masłem", "", new String[]{"chleb", "masło"},new String[]{"kromka","troszku"},null,null);
         myDBHandler.addRecipe(recipe);
 
 

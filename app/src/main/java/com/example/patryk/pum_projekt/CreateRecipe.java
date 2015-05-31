@@ -16,12 +16,10 @@ import android.provider.MediaStore;
 import android.text.InputType;
 import android.util.TypedValue;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -33,20 +31,22 @@ import java.util.LinkedList;
 
 public class CreateRecipe extends Activity implements View.OnClickListener {
 
-    private static final int SELECT_PICTURE = 1;
+
 
     private MyDBHandler myDBHandler;
-    Button buttonAddIngredient, buttonAddAlarm, buttonRemoveAlarm, buttonGalleryImg, buttonPhotoImg;
+    Button buttonAddIngredient, buttonAddAlarm, buttonRemoveAlarm, buttonGalleryImg, buttonPhotoImg,
+    buttonSave;
     ListView ingredientList;
     private ImageView img;
     private IngredientListAdapter adapter;
     private ArrayList<Ingredient> ingredients;
-    private EditText editIngredient, editAmount;
+    private EditText editIngredient, editAmount, editName;
     private LinkedList<Integer> alarmTimeList;
     private LinkedList<String> alarmNameList;
     private TextView textViewAlarms;
-    private String selectedImagePath;
-
+    private EditText editDesc;
+    private int editId;
+    private boolean edit = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -64,7 +64,7 @@ public class CreateRecipe extends Activity implements View.OnClickListener {
 
 
 
-        //myDBHandler = new MyDBHandler(this, null, null, 0);
+        myDBHandler = new MyDBHandler(this, null, null, 0);
 
         buttonAddIngredient = (Button) findViewById(R.id.ButtonAddIngredient);
         buttonAddIngredient.setOnClickListener(this);
@@ -76,11 +76,15 @@ public class CreateRecipe extends Activity implements View.OnClickListener {
         buttonPhotoImg.setOnClickListener(this);
         buttonGalleryImg = (Button) findViewById(R.id.ButtonImgGallery);
         buttonGalleryImg.setOnClickListener(this);
+        buttonSave = (Button) findViewById(R.id.ButtonFinishAdding);
+        buttonSave.setOnClickListener(this);
+
 
 
         editAmount = (EditText) findViewById(R.id.EditTextAmount);
         editIngredient  = (EditText) findViewById(R.id.EditTextIngredient);
-
+        editName = (EditText) findViewById(R.id.EditTextTitle);
+        editDesc = (EditText) findViewById(R.id.EditTextDesc);
         //setListViewHeightBasedOnChildren(ingredientList);
 
         alarmNameList = new LinkedList<>();
@@ -89,6 +93,47 @@ public class CreateRecipe extends Activity implements View.OnClickListener {
         textViewAlarms.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
 
         img = (ImageView) findViewById(R.id.ImageViewImg);
+
+        img.setImageDrawable(getResources().getDrawable(R.drawable.recipe_logo));
+        img.setMaxHeight(250);
+        img.setMaxWidth(250);
+
+        Bundle extras = getIntent().getExtras();
+        if(extras!=null) {
+            editId = extras.getInt("id", -1);
+            if (editId == -1) {
+                Recipe editRecipe = myDBHandler.getRecipe(editId);
+                loadRecipe(editRecipe);
+                edit = true;
+            }
+        }
+
+    }
+
+    private void loadRecipe(Recipe editRecipe) {
+        editName.setText(editRecipe.getRecipename());
+        editDesc.setText(editRecipe.getRecipredescription());
+
+        if(!editRecipe.getRecipePath().equals(""))
+        {
+            img.setImageBitmap(decodeFile(editRecipe.getRecipePath()));
+        }
+
+        String[] ing = editRecipe.getIngredients();
+        String[] ingA = editRecipe.getIngredientsAmount();
+
+        for (int i = 0; i < ing.length; i++) {
+            Ingredient ingredient = new Ingredient(ing[i],ingA[i]);
+            adapter.add(ingredient);
+        }
+
+        String[] task = editRecipe.getTasks();
+        int[] taskTime = editRecipe.getTasksTime();
+
+        for (int i = 0; i < task.length; i++) {
+            setUpAlarm(taskTime[i],task[i]);
+        }
+
 
     }
 
@@ -103,26 +148,26 @@ public class CreateRecipe extends Activity implements View.OnClickListener {
         Ingredient ingredientToRemove = (Ingredient)v.getTag();
         adapter.remove(ingredientToRemove);
     }
-
-    public static void setListViewHeightBasedOnChildren(ListView listView) {
-        ListAdapter listAdapter = listView.getAdapter();
-        if (listAdapter == null) {
-            // pre-condition
-            return;
-        }
-
-        int totalHeight = 0;
-        for (int i = 0; i < listAdapter.getCount(); i++) {
-            View listItem = listAdapter.getView(i, null, listView);
-            listItem.measure(0, 0);
-            totalHeight += listItem.getMeasuredHeight();
-        }
-
-        ViewGroup.LayoutParams params = listView.getLayoutParams();
-        params.height = totalHeight + (listView.getDividerHeight() * (listAdapter.getCount() - 1));
-        listView.setLayoutParams(params);
-        listView.requestLayout();
-    }
+//
+//    public static void setListViewHeightBasedOnChildren(ListView listView) {
+//        ListAdapter listAdapter = listView.getAdapter();
+//        if (listAdapter == null) {
+//            // pre-condition
+//            return;
+//        }
+//
+//        int totalHeight = 0;
+//        for (int i = 0; i < listAdapter.getCount(); i++) {
+//            View listItem = listAdapter.getView(i, null, listView);
+//            listItem.measure(0, 0);
+//            totalHeight += listItem.getMeasuredHeight();
+//        }
+//
+//        ViewGroup.LayoutParams params = listView.getLayoutParams();
+//        params.height = totalHeight + (listView.getDividerHeight() * (listAdapter.getCount() - 1));
+//        listView.setLayoutParams(params);
+//        listView.requestLayout();
+//    }
 
     @Override
     public void onClick(View view) {
@@ -132,6 +177,9 @@ public class CreateRecipe extends Activity implements View.OnClickListener {
             String amount = editAmount.getText().toString();
 
             adapter.add(new Ingredient(name,amount));
+
+            editIngredient.setText("");
+            editAmount.setText("");
 
         }
         if(view.getId() == buttonAddAlarm.getId())
@@ -198,7 +246,47 @@ public class CreateRecipe extends Activity implements View.OnClickListener {
             intent.putExtra(MediaStore.EXTRA_OUTPUT, setImageUri());
             startActivityForResult(intent, CAPTURE_IMAGE);
         }
+        if(view.getId() == buttonSave.getId()) {
 
+            Recipe newRecipe = getRecipe();
+            if(edit) {
+                myDBHandler.editRecipe(editId,newRecipe);
+                edit = false;
+                editId = -1;
+            }
+            else {
+                myDBHandler.addRecipe(newRecipe);
+            }
+            finish();
+
+        }
+
+    }
+
+    private Recipe getRecipe() {
+        Recipe recipe;
+        String name = editName.getText().toString();
+        if(name.equals("")) { name = "default"; }
+
+        String desc = editDesc.getText().toString();
+        if(desc.equals("")) { desc = "default"; }
+
+
+
+        String[] ingredientsArr = new String[ingredients.size()];
+        String[] ingredientsAmountArr = new String[ingredients.size()];
+        for (int i = 0; i < ingredients.size(); i++) {
+            ingredientsAmountArr[i] = ingredients.get(i).getAmount();
+            ingredientsArr[i] = ingredients.get(i).getName();
+        }
+        String[] taskName = new String[alarmNameList.size()];
+        int[] taskTime = new int[alarmTimeList.size()];
+        for (int i = 0; i < alarmNameList.size(); i++) {
+            taskTime[i] = alarmTimeList.get(i)*60;
+            taskName[i] = alarmNameList.get(i);
+        }
+        recipe = new Recipe(name, desc, imgPath, ingredientsArr, ingredientsAmountArr, taskName, taskTime);
+        return recipe;
     }
 
     private void setUpAlarm(int alarmTimeValue, String alarmString) {

@@ -10,7 +10,7 @@ import java.util.ArrayList;
 
 public class MyDBHandler extends SQLiteOpenHelper {
 
-    private static final int DATABASE_VERSION = 15; //tutaj trzeba zmienić przy wprowadzaniu zmian do struktury bazy
+    private static final int DATABASE_VERSION = 18; //tutaj trzeba zmienić przy wprowadzaniu zmian do struktury bazy
 
     private static final String DATABASE_NAME = "database.db";
 
@@ -21,6 +21,8 @@ public class MyDBHandler extends SQLiteOpenHelper {
     public static final String COLUMN_ID = "_id";
     public static final String COLUMN_RECIPE = "recipe";
     public static final String COLUMN_RECIPEDESCRIPTION = "recipedescription";
+    private static final String COLUMN_RECIPEPATH = "recipepath";
+
 
     public static final String COLUMN_RECIPE_ID = "idrecipe";
     public static final String COLUMN_INGREDIENT = "ingredient";
@@ -42,7 +44,8 @@ public class MyDBHandler extends SQLiteOpenHelper {
         String query = "CREATE TABLE " + TABLE_NAME_RECIPES + "( " +
                 COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 COLUMN_RECIPE + " TEXT, " +
-                COLUMN_RECIPEDESCRIPTION + " TEXT " +
+                COLUMN_RECIPEDESCRIPTION + " TEXT, " +
+                COLUMN_RECIPEPATH + " TEXT " +
                 ")" +" ;";
         db.execSQL(query);
 
@@ -92,6 +95,7 @@ public class MyDBHandler extends SQLiteOpenHelper {
 
         values.put(COLUMN_RECIPE, recipe.getRecipename());
         values.put(COLUMN_RECIPEDESCRIPTION, recipe.getRecipredescription());
+        values.put(COLUMN_RECIPEPATH, recipe.getRecipePath());
 
 
         db.insert(TABLE_NAME_RECIPES,null,values); //dodajemy nazwę i opis
@@ -154,7 +158,7 @@ public class MyDBHandler extends SQLiteOpenHelper {
         while(!cursor.isAfterLast())
         {
 
-            Recipe recipe = new Recipe(cursor.getString(1),cursor.getString(2),null,null,null,null);
+            Recipe recipe = new Recipe(cursor.getString(1),cursor.getString(2),cursor.getString(3),null,null,null,null);
             recipe.set_id(cursor.getInt(0));
             recipes.add(recipe);
             cursor.moveToNext();
@@ -176,6 +180,7 @@ public class MyDBHandler extends SQLiteOpenHelper {
         Recipe recipe = new Recipe(
                 cursor.getString(1),
                 cursor.getString(2),
+                cursor.getString(3),
                 null,
                 null,
                 null,
@@ -201,6 +206,7 @@ public class MyDBHandler extends SQLiteOpenHelper {
         int recipeID = cursor.getInt(0);
         String name = cursor.getString(1);
         String description = cursor.getString(2);
+        String path = cursor.getString(3);
 
         cursor = db.rawQuery("SELECT * FROM " + TABLE_NAME_INGREDIENTS + " WHERE " + COLUMN_RECIPE_ID + " = " + _id, null);
 
@@ -233,6 +239,7 @@ public class MyDBHandler extends SQLiteOpenHelper {
         Recipe recipe = new Recipe(
                 name,
                 description,
+                path,
                 ingredients.toArray(new String[ingredients.size()]),
                 ingredientsAmount.toArray(new String[ingredientsAmount.size()]),
                 tasks.toArray(new String[tasks.size()]),
@@ -254,6 +261,57 @@ public class MyDBHandler extends SQLiteOpenHelper {
         db.close();
 
         return true;
+    }
+    public boolean editRecipe(int id, Recipe recipe) {
+        ContentValues cv = new ContentValues();
+        SQLiteDatabase db = getWritableDatabase();
+
+        cv.put(COLUMN_RECIPE, recipe.getRecipename());
+        cv.put(COLUMN_RECIPEDESCRIPTION, recipe.getRecipredescription());
+        cv.put(COLUMN_RECIPEPATH, recipe.getRecipePath());
+
+
+        db.update(TABLE_NAME_RECIPES, cv, "_id" + "=" + id, null);
+        db.delete(TABLE_NAME_TASKS, COLUMN_RECIPE_ID + " = " + id, null);
+        db.delete(TABLE_NAME_INGREDIENTS, COLUMN_RECIPE_ID + " = " + id, null);
+
+        String[] ingredients = recipe.getIngredients();
+        String[] ingredientsAmount = recipe.getIngredientsAmount();
+
+        String[] tasks = recipe.getTasks();
+        int[] taskstime = recipe.getTasksTime();
+
+        if(ingredients!=null)
+        {
+            for (int i = 0; i < ingredients.length; i++) //dodajemy składniki i ich ilosci
+            {
+                ContentValues values = new ContentValues();
+
+                values.put(COLUMN_RECIPE_ID, id);
+                values.put(COLUMN_INGREDIENT, ingredients[i]);
+                values.put(COLUMN_INGREDIENT_AMOUNT, ingredientsAmount[i]);
+
+                db.insert(TABLE_NAME_INGREDIENTS, null, values);
+            }
+        }
+
+        if(tasks != null)
+        {
+            for (int i = 0; i < tasks.length; i++) //dodajemy zadania i ich czasy trwania
+            {
+                ContentValues values = new ContentValues();
+
+                values.put(COLUMN_RECIPE_ID, id);
+                values.put(COLUMN_TASK, tasks[i]);
+                values.put(COLUMN_TASK_TIME, taskstime[i]);
+
+                db.insert(TABLE_NAME_TASKS, null, values);
+            }
+        }
+        db.close();
+
+        return true;
+
     }
 
     private int[] listToArray(ArrayList<Integer> list){

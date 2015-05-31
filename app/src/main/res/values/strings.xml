@@ -28,4 +28,5 @@
     <string name="set_new_alarm">Dodaj nowy alarm</string>
     <string name="remove_last_alarm">usuń alarm</string>
     <string name="set_alarm_dialog">ustaw tytuł alarmu i jego czas</string>
+    <string name="ButtonEdit">Edytuj</string>
 </resources>

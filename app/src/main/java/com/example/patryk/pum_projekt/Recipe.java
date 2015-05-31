@@ -12,14 +12,16 @@ public class Recipe {
     private String[] ingredientsAmount; //ilość składników - jest w stringu, bo równie dobrze może to być "kilogram" pomidorów albo "łyżeczka" pieprzu
     private String[] tasks; //zadania do przepisu
     private int[] tasksTime; //czas trwania zadań (w sekundach)
+    private String recipePath; // ściezka do obrazka
 
-    Recipe(String recipename, String recipredescription, String[] ingredients,String[] ingredientsAmount,String[] tasks,int[] tasksTime) {
+    Recipe(String recipename, String recipredescription, String recipePath, String[] ingredients,String[] ingredientsAmount,String[] tasks,int[] tasksTime) {
         this.recipename = recipename;
         this.recipredescription = recipredescription;
         this.ingredients = ingredients;
         this.ingredientsAmount = ingredientsAmount;
         this.tasks = tasks;
         this.tasksTime = tasksTime;
+        this.recipePath = recipePath;
     }
 
     public String getRecipename()
@@ -30,6 +32,10 @@ public class Recipe {
     public String getRecipredescription()
     {
         return recipredescription;
+    }
+
+    public String getRecipePath() {
+        return recipePath;
     }
 
     public void set_id(int id)

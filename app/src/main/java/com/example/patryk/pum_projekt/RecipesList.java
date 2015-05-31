@@ -5,18 +5,17 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ListAdapter;
+import android.widget.Button;
 import android.widget.ListView;
 
 import java.util.ArrayList;
 
 
-public class RecipesList extends Activity implements ListView.OnItemClickListener, ListView.OnItemLongClickListener {
+public class RecipesList extends Activity implements ListView.OnItemClickListener, ListView.OnItemLongClickListener  {
 
 
     MyDBHandler myDBHandler;
@@ -40,7 +39,18 @@ public class RecipesList extends Activity implements ListView.OnItemClickListene
         recipesListPortait.setAdapter(listAdapter);
         recipesListPortait.requestFocus();
 
+        Button buttonAddRecipe =(Button) findViewById(R.id.buttonAddRecipe);
+        buttonAddRecipe.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent createNewRecipe = new Intent(RecipesList.this, CreateRecipe.class);
+                RecipesList.this.startActivity(createNewRecipe);
+            }
+        });
+
     }
+
+
 
 
     @Override
@@ -85,6 +95,13 @@ public class RecipesList extends Activity implements ListView.OnItemClickListene
         builder.setNegativeButton("Edytuj przepis", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
                 //kod do edytowania przepisów
+                Recipe recipeToEdit = (Recipe) parent.getItemAtPosition(position);
+
+                Intent i = new Intent(RecipesList.this ,CreateRecipe.class);
+                Bundle extras = i.getExtras();
+                extras.putInt("id",recipeToEdit.get_id());
+                RecipesList.this.startActivity(i);
+
             }
         });
 

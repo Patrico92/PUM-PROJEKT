@@ -1,38 +1,25 @@
 package com.example.patryk.pum_projekt;
 
 import android.app.Activity;
-import android.app.AlarmManager;
-import android.app.PendingIntent;
-import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Typeface;
-import android.media.MediaPlayer;
-import android.media.RingtoneManager;
-import android.net.Uri;
-import android.provider.AlarmClock;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
-import android.util.Log;
+import android.provider.AlarmClock;
 import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import java.util.GregorianCalendar;
 import java.util.Timer;
-import java.util.TimerTask;
-
-import static com.example.patryk.pum_projekt.R.id.taskTime;
 
 
 public class RecipeDisplay extends Activity implements Button.OnClickListener {
@@ -70,9 +57,13 @@ public class RecipeDisplay extends Activity implements Button.OnClickListener {
         recipeImage.setId(++id);
 
         recipeImage.setScaleType(ImageView.ScaleType.FIT_CENTER);
-
-        recipeImage.setImageResource(R.drawable.logo);
-
+        if(recipe.getRecipePath().equals("")) {
+            recipeImage.setImageResource(R.drawable.logo);
+        }
+        else
+        {
+            recipeImage.setImageBitmap(decodeFile(recipe.getRecipePath()));
+        }
         RelativeLayout.LayoutParams details = new RelativeLayout.LayoutParams(
                 size,
                 size
@@ -201,7 +192,7 @@ public class RecipeDisplay extends Activity implements Button.OnClickListener {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_recipe_display, menu);
+        //getMenuInflater().inflate(R.menu.menu_recipe_display, menu);
         return true;
     }
 
@@ -248,6 +239,30 @@ public class RecipeDisplay extends Activity implements Button.OnClickListener {
         button.setText(button.getTag(R.id.taskName) + " zrobione!");
 
         startTimer(button.getTag(R.id.taskName) + " zakonczone!", (Integer) button.getTag(R.id.taskTime));
+
+    }
+    public Bitmap decodeFile(String path) {
+        try {
+            // Decode image size
+            BitmapFactory.Options o = new BitmapFactory.Options();
+            o.inJustDecodeBounds = true;
+            BitmapFactory.decodeFile(path, o);
+            // The new size we want to scale to
+            final int REQUIRED_SIZE = 300;
+
+            // Find the correct scale value. It should be the power of 2.
+            int scale = 1;
+            while (o.outWidth / scale / 2 >= REQUIRED_SIZE && o.outHeight / scale / 2 >= REQUIRED_SIZE)
+                scale *= 2;
+
+            // Decode with inSampleSize
+            BitmapFactory.Options o2 = new BitmapFactory.Options();
+            o2.inSampleSize = scale;
+            return BitmapFactory.decodeFile(path, o2);
+        } catch (Throwable e) {
+            e.printStackTrace();
+        }
+        return null;
 
     }
 
